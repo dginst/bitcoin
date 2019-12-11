@@ -5,6 +5,7 @@
 """Encode and decode BASE58, P2PKH and P2SH addresses."""
 
 import enum
+from binascii import unhexlify
 
 from .script import hash256, hash160, sha256, CScript, OP_0
 from .util import hex_str_to_bytes
@@ -38,7 +39,33 @@ def byte_to_base58(b, version):
         str = str[2:]
     return result
 
-# TODO: def base58_decode
+def base58_decode(s):
+    """Decode a base58-encoding string, returning bytes"""
+    if not s:
+        return b''
+
+    # Convert the string to an integer
+    n = 0
+    for c in s:
+        n *= 58
+        if c not in chars:
+            raise InvalidBase58Error('Character %r is not a valid base58 character' % c)
+        digit = chars.index(c)
+        n += digit
+
+    # Convert the integer to bytes
+    h = '%x' % n
+    if len(h) % 2:
+        h = '0' + h
+    res = unhexlify(h.encode('utf8'))
+
+    # Add padding back.
+    pad = 0
+    for c in s[:-1]:
+        if c == chars[0]: pad += 1
+        else: break
+    return b'\x00' * pad + res
+
 
 def keyhash_to_p2pkh(hash, main = False):
     assert len(hash) == 20

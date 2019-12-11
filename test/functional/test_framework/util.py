@@ -8,6 +8,7 @@ from base64 import b64encode
 from binascii import unhexlify
 from decimal import Decimal, ROUND_DOWN
 from subprocess import CalledProcessError
+from binascii import hexlify
 import inspect
 import json
 import logging
@@ -196,6 +197,9 @@ def count_bytes(hex_string):
 
 def hex_str_to_bytes(hex_str):
     return unhexlify(hex_str.encode('ascii'))
+
+def bytes_to_hex_str(byte_str):
+    return hexlify(byte_str).decode('ascii')
 
 def str_to_b64str(string):
     return b64encode(string.encode('utf-8')).decode('ascii')
